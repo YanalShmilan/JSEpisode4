@@ -9,8 +9,8 @@ const books = require('./books.json');
  * - returns undefined if no matching book is found
  ****************************************************************/
 function getBookById(bookId, books) {
-  let i = books.find((e) => e.id === bookId);
-  return i;
+  let booksById = books.find((book) => book.id === bookId);
+  return booksById;
   // Your code goes here
 }
 // console.log(getBookById(12, books));
@@ -24,10 +24,10 @@ function getBookById(bookId, books) {
  ****************************************************************/
 function getAuthorByName(authorName, authors) {
   // Your code goes here
-  let i = authors.find(
-    (e) => e.name.toLowerCase() === authorName.toLowerCase()
+  let authorByNam = authors.find(
+    (author) => author.name.toLowerCase() === authorName.toLowerCase()
   );
-  return i;
+  return authorByNam;
 }
 // console.log(getAuthorByName('J.K. Rowling', authors));
 
@@ -38,12 +38,11 @@ function getAuthorByName(authorName, authors) {
  *    [{ author: <NAME>, bookCount: <NUMBER_OF_BOOKS> }]
  ****************************************************************/
 function bookCountsByAuthor(authors) {
-  let i = [];
-  authors.forEach((e) => {
-    i.push({ author: e.name, bookCount: e.books.length });
+  let bookCount = [];
+  authors.forEach((author) => {
+    bookCount.push({ author: author.name, bookCount: author.books.length });
   });
-  // Your code goes here
-  return i;
+  return bookCount;
 }
 // console.log(bookCountsByAuthor(authors));
 
@@ -56,24 +55,25 @@ function bookCountsByAuthor(authors) {
  ****************************************************************/
 function booksByColor(books) {
   const colors = {};
-  let colorss = [];
+  // extracting a list of available colors
+  let listOfColors = [];
   books.forEach((book) => {
-    if (!colorss.includes(book.color)) {
-      colorss.push(book.color);
+    if (!listOfColors.includes(book.color)) {
+      listOfColors.push(book.color);
     }
   });
-  colorss.forEach((color) => {
-    let a = [];
+  // iterating over the listOfColors and storing the books that matches the color
+  listOfColors.forEach((color) => {
+    let booksWithTheSameColor = [];
     books.forEach((book) => {
       if (book.color === color) {
-        a.push(book.title);
+        booksWithTheSameColor.push(book.title);
       }
     });
-    colors[color] = a;
+    colors[color] = booksWithTheSameColor;
   });
 
   // Your code goes here
-  console.log(colorss);
   return colors;
 }
 // console.log(booksByColor(books));
@@ -88,13 +88,13 @@ function booksByColor(books) {
  ****************************************************************/
 function titlesByAuthorName(authorName, authors, books) {
   // Your code goes here
-  let x = [];
+  let titlesByAuthor = [];
   books.forEach((book) => {
     if (book.authors[0].name.toLowerCase() === authorName.toLowerCase()) {
-      x.push(book.title);
+      titlesByAuthor.push(book.title);
     }
   });
-  return x;
+  return titlesByAuthor;
 }
 // console.log(titlesByAuthorName('George R.R. Martin', authors, books));
 
@@ -108,14 +108,14 @@ function titlesByAuthorName(authorName, authors, books) {
 function mostProlificAuthor(authors) {
   // Your code goes here
   let x = 0;
-  let y = '';
+  let authorName = '';
   authors.forEach((author) => {
     if (author.books.length > x) {
       x = author.books.length;
-      y = author.name;
+      authorName = author.name;
     }
   });
-  return y;
+  return authorName;
 }
 // console.log(mostProlificAuthor(authors));
 
@@ -143,35 +143,36 @@ function mostProlificAuthor(authors) {
  * BONUS: REMOVE DUPLICATE BOOKS
  ****************************************************************/
 function relatedBooks(bookId, authors, books) {
-  let x = [];
-  let y = [];
-  let z = [];
+  let authorsOfTheBook = [];
+  let authorsNames = [];
+  let bookTitles = [];
+  // iterating over the books and getting the authors object of the book by bookId
   books.forEach((book) => {
     if (book.id === bookId) {
-      x.push(book.authors);
+      authorsOfTheBook.push(book.authors);
     }
   });
-  x.forEach((e) => {
-    console.log(e.name);
-
-    e.forEach((s) => {
-      y.push(s.name);
+  // iterating over the authorsOfTheBook objects and extracting the names only
+  authorsOfTheBook.forEach((author) => {
+    author.forEach((auth) => {
+      authorsNames.push(auth.name);
     });
   });
-  y.forEach((g) => {
-    books.forEach((f) => {
-      f.authors.forEach((e) => {
-        if (e.name === g) {
-          z.push(f.title);
+  // iterating over authorsNames and getting thier books by their name
+  authorsNames.forEach((author) => {
+    books.forEach((book) => {
+      book.authors.forEach((b) => {
+        if (b.name === author) {
+          bookTitles.push(book.title);
         }
       });
     });
   });
-
-  return z;
+  return bookTitles;
+  // removes dupli [...new Set(bookTitles)]
   // Your code goes here
 }
-console.log(relatedBooks(46, authors, books));
+// console.log(relatedBooks(46, authors, books));
 
 /**************************************************************
  * friendliestAuthor(authors):
@@ -180,18 +181,47 @@ console.log(relatedBooks(46, authors, books));
  *   co-authored the greatest number of books
  ****************************************************************/
 function friendliestAuthor(authors) {
-  let x = 0;
-  let y = '';
-  authors.forEach((author) => {
-    if (author.books.length > x) {
-      x = author.books.length;
-      y = author.name;
+  let AuthorsOfTheCommonBooks = [];
+  let i = 0;
+  let authorName = '';
+  // comparing each 2 authors and storing the authors of the common book
+  while (i < authors.length) {
+    let y = 1;
+    while (y < authors.length) {
+      if (
+        CommonBookId(authors[i].books, authors[y].books).length > 0 &&
+        i != y
+      ) {
+        // commonBooks.push(CommonBookId(authors[i].books, authors[y].books));
+        AuthorsOfTheCommonBooks.push(authors[i].name, authors[y].name);
+      }
+      y++;
+    }
+    i++;
+  }
+  //commonBooks = commonBooks.flat();
+  // commonBooks = ['a', 'a', 'b', 'a', 'b', 'b', 'b', 'a', 'a'];
+  // commonBooks = [...new Set(commonBooks)];
+  // getting the most occurrence of an author
+  authorName = AuthorsOfTheCommonBooks.reduce((a, b, i, arr) => {
+    if (
+      arr.filter((v) => v === a).length >= arr.filter((v) => v === b).length
+    ) {
+      return a;
+    } else {
+      return b;
     }
   });
-  return y;
+
+  return authorName;
   // Your code goes here
 }
-// console.log(friendliestAuthor(authors));
+function CommonBookId(firstAuth, secondAuth) {
+  let s = new Set(secondAuth);
+  return firstAuth.filter((item) => s.has(item));
+}
+
+console.log(friendliestAuthor(authors));
 
 module.exports = {
   getBookById,
